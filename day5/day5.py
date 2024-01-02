@@ -1,9 +1,12 @@
-def convert_number(source_number, map):
+# Was able to complete part 1 with this code, but wasn't able to complete part 2. See day5_2 for part 2 code.
+
+import sys
+def convert_number(source_number, maps):
     #print('source number', source_number)
     converted_number=source_number
     #print(map)
-    for subset in map:
-        print(subset)
+    for subset in maps:
+        #print(subset)
         source_range_start=subset['source_range_start']
         dest_range_start=subset['dest_range_start']
         range_length=subset['range_length']
@@ -13,26 +16,36 @@ def convert_number(source_number, map):
     #print('converted number', converted_number)
     return converted_number
 
-def get_lowest_number(seeds, maps):
-    converted_numbers=[]
-    for seed in seeds:
-        source_number = seed
-        for map in maps:
-            print('seed number', source_number)
-            source_number = convert_number(source_number, maps[map])
-            print('location number', source_number)
-        converted_numbers.append(source_number)
-    return min(converted_numbers)
+def get_lowest_number(seed_range, maps):
+    lowest_converted_number=int(sys.maxsize)
+    for set in seed_range:
+        print(set)
+        start=set[0]
+        length=set[1]
+        for seed in range(start,start+length):
+            source_number = seed
+            for map in maps:
+                #print('source number', source_number)
+                source_number = convert_number(source_number, maps[map])
+            if source_number<lowest_converted_number:
+                #print(source_number, lowest_converted_number)
+                lowest_converted_number=source_number
+                #print('location number', source_number)
+    return lowest_converted_number
 
 def read_input(input):
     with open(input) as f:
         almanac = f.readlines()
-        seeds = list(map(int, almanac[0].strip().split(' ')[1:]))
-        print(seeds)
+        first_line = list(map(int, almanac[0].strip().split(' ')[1:]))
+        seed_ranges = []
+        for start, length in zip(first_line[0::2], first_line[1::2]):
+            print(start, length)
+            start, length = int(start), int(length)
+            seed_ranges.append([start, length])
+        print(seed_ranges)
         maps={}
         current_map=None
         for line in almanac[2:]:           
-            #print(line, end='')
             if not line.strip():
                 continue
             if line.endswith('map:\n'):
@@ -44,12 +57,11 @@ def read_input(input):
                 maps[current_map].append({'dest_range_start': dest_range_start, 'source_range_start': source_range_start, 'range_length': range_length})
         for x, y in enumerate(maps):
             print(x, y)
-        print(maps)
-        return seeds, maps
+        return seed_ranges, maps
 
 def main():
-    seeds, maps = read_input('day5/day5_input.txt')
-    lowest_number = get_lowest_number(seeds,maps)
+    seed_ranges, maps = read_input('day5/day5_input.txt')
+    lowest_number = get_lowest_number(seed_ranges,maps)
     print('lowest number is', lowest_number)
     return
 
